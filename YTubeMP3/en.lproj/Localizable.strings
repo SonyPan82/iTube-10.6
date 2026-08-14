@@ -1,0 +1,37 @@
+/* Window & menu */
+"window_title" = "iTube - YouTube Search -> MP3";
+"menu_quit_format" = "Quit %@";
+"menu_edit" = "Edit";
+"menu_cut" = "Cut";
+"menu_copy" = "Copy";
+"menu_paste" = "Paste";
+"menu_select_all" = "Select All";
+
+/* Search */
+"search_placeholder" = "Search a YouTube video...";
+"search_button" = "Search";
+"column_title" = "Title";
+"column_uploader" = "Channel";
+"column_duration" = "Duration";
+
+/* Folder / download */
+"folder_prefix" = "Folder: ";
+"choose_folder_button" = "Choose...";
+"choose_folder_prompt" = "Choose";
+"download_button" = "Download as MP3";
+
+/* Status messages */
+"status_ready" = "Ready.";
+"status_ytdlp_missing" = "yt-dlp not found in the application bundle. See README.md (vendor.sh).";
+"status_searching" = "Searching...";
+"status_no_results" = "No results.";
+"status_results_format" = "%d result(s).";
+"status_search_failed" = "Search failed.";
+"status_downloading_format" = "Downloading: %@";
+"status_download_done_format" = "Done: %@";
+"status_download_failed" = "Download failed.";
+
+/* Alerts */
+"alert_search_failed_title" = "Search failed";
+"alert_download_failed_title" = "Download failed";
+"alert_ok_button" = "OK";

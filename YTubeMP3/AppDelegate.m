@@ -60,10 +60,10 @@
 
     NSString *ytdlpPath = [YTDLPController bundledYTDLPPath];
     if (ytdlpPath == nil) {
-        [self setStatus:@"yt-dlp introuvable dans le bundle de l'application. Voir README.md (vendor.sh)."];
+        [self setStatus:NSLocalizedString(@"status_ytdlp_missing", nil)];
         [self setControlsEnabled:NO];
     } else {
-        [self setStatus:@"Pret."];
+        [self setStatus:NSLocalizedString(@"status_ready", nil)];
     }
 }
 
@@ -82,7 +82,8 @@
     NSMenu *appMenu = [[NSMenu alloc] initWithTitle:@"iTube"];
 
     NSString *appName = @"iTube";
-    NSMenuItem *quitItem = [[NSMenuItem alloc] initWithTitle:[@"Quitter " stringByAppendingString:appName]
+    NSString *quitTitle = [NSString stringWithFormat:NSLocalizedString(@"menu_quit_format", nil), appName];
+    NSMenuItem *quitItem = [[NSMenuItem alloc] initWithTitle:quitTitle
                                                         action:@selector(terminate:)
                                                  keyEquivalent:@"q"];
     [appMenu addItem:quitItem];
@@ -94,12 +95,13 @@
     [appMenu release];
 
     // Standard Edit menu so Cmd+C / Cmd+V / Cmd+A work in text fields.
-    NSMenuItem *editMenuItem = [[NSMenuItem alloc] initWithTitle:@"" action:NULL keyEquivalent:@""];
-    NSMenu *editMenu = [[NSMenu alloc] initWithTitle:@"Edition"];
-    [editMenu addItemWithTitle:@"Couper" action:@selector(cut:) keyEquivalent:@"x"];
-    [editMenu addItemWithTitle:@"Copier" action:@selector(copy:) keyEquivalent:@"c"];
-    [editMenu addItemWithTitle:@"Coller" action:@selector(paste:) keyEquivalent:@"v"];
-    [editMenu addItemWithTitle:@"Tout selectionner" action:@selector(selectAll:) keyEquivalent:@"a"];
+    NSString *editTitle = NSLocalizedString(@"menu_edit", nil);
+    NSMenuItem *editMenuItem = [[NSMenuItem alloc] initWithTitle:editTitle action:NULL keyEquivalent:@""];
+    NSMenu *editMenu = [[NSMenu alloc] initWithTitle:editTitle];
+    [editMenu addItemWithTitle:NSLocalizedString(@"menu_cut", nil) action:@selector(cut:) keyEquivalent:@"x"];
+    [editMenu addItemWithTitle:NSLocalizedString(@"menu_copy", nil) action:@selector(copy:) keyEquivalent:@"c"];
+    [editMenu addItemWithTitle:NSLocalizedString(@"menu_paste", nil) action:@selector(paste:) keyEquivalent:@"v"];
+    [editMenu addItemWithTitle:NSLocalizedString(@"menu_select_all", nil) action:@selector(selectAll:) keyEquivalent:@"a"];
     [editMenuItem setSubmenu:editMenu];
     [mainMenu addItem:editMenuItem];
     [editMenuItem release];
@@ -120,7 +122,7 @@
                                           styleMask:styleMask
                                             backing:NSBackingStoreBuffered
                                               defer:NO];
-    [window setTitle:@"iTube - Recherche YouTube -> MP3"];
+    [window setTitle:NSLocalizedString(@"window_title", nil)];
     [window setMinSize:NSMakeSize(480, 360)];
     [window center];
 
@@ -130,7 +132,7 @@
     NSRect searchFieldFrame = NSMakeRect(kMargin, kWindowHeight - 44, kWindowWidth - kMargin * 2 - 100, 24);
     searchField = [[NSTextField alloc] initWithFrame:searchFieldFrame];
     [searchField setAutoresizingMask:(NSViewWidthSizable | NSViewMinYMargin)];
-    [[searchField cell] setPlaceholderString:@"Rechercher une video YouTube..."];
+    [[searchField cell] setPlaceholderString:NSLocalizedString(@"search_placeholder", nil)];
     [searchField setTarget:self];
     [searchField setAction:@selector(searchButtonClicked:)];
     [content addSubview:searchField];
@@ -139,7 +141,7 @@
     NSRect searchButtonFrame = NSMakeRect(kWindowWidth - kMargin - 90, kWindowHeight - 45, 90, 26);
     searchButton = [[NSButton alloc] initWithFrame:searchButtonFrame];
     [searchButton setAutoresizingMask:(NSViewMinXMargin | NSViewMinYMargin)];
-    [searchButton setTitle:@"Rechercher"];
+    [searchButton setTitle:NSLocalizedString(@"search_button", nil)];
     [searchButton setBezelStyle:NSRoundedBezelStyle];
     [searchButton setTarget:self];
     [searchButton setAction:@selector(searchButtonClicked:)];
@@ -157,19 +159,19 @@
     [resultsTableView setAllowsMultipleSelection:NO];
 
     NSTableColumn *titleColumn = [[NSTableColumn alloc] initWithIdentifier:@"title"];
-    [[titleColumn headerCell] setStringValue:@"Titre"];
+    [[titleColumn headerCell] setStringValue:NSLocalizedString(@"column_title", nil)];
     [titleColumn setWidth:320];
     [resultsTableView addTableColumn:titleColumn];
     [titleColumn release];
 
     NSTableColumn *uploaderColumn = [[NSTableColumn alloc] initWithIdentifier:@"uploader"];
-    [[uploaderColumn headerCell] setStringValue:@"Chaine"];
+    [[uploaderColumn headerCell] setStringValue:NSLocalizedString(@"column_uploader", nil)];
     [uploaderColumn setWidth:150];
     [resultsTableView addTableColumn:uploaderColumn];
     [uploaderColumn release];
 
     NSTableColumn *durationColumn = [[NSTableColumn alloc] initWithIdentifier:@"duration"];
-    [[durationColumn headerCell] setStringValue:@"Duree"];
+    [[durationColumn headerCell] setStringValue:NSLocalizedString(@"column_duration", nil)];
     [durationColumn setWidth:80];
     [resultsTableView addTableColumn:durationColumn];
     [durationColumn release];
@@ -191,14 +193,14 @@
     [folderLabel setEditable:NO];
     [folderLabel setBordered:NO];
     [folderLabel setDrawsBackground:NO];
-    [folderLabel setStringValue:[@"Dossier : " stringByAppendingString:downloadDirectory]];
+    [folderLabel setStringValue:[NSLocalizedString(@"folder_prefix", nil) stringByAppendingString:downloadDirectory]];
     [content addSubview:folderLabel];
     [folderLabel release];
 
     NSRect chooseFolderFrame = NSMakeRect(kWindowWidth - kMargin - 120, 80, 120, 26);
     chooseFolderButton = [[NSButton alloc] initWithFrame:chooseFolderFrame];
     [chooseFolderButton setAutoresizingMask:(NSViewMinXMargin | NSViewMaxYMargin)];
-    [chooseFolderButton setTitle:@"Choisir..."];
+    [chooseFolderButton setTitle:NSLocalizedString(@"choose_folder_button", nil)];
     [chooseFolderButton setBezelStyle:NSRoundedBezelStyle];
     [chooseFolderButton setTarget:self];
     [chooseFolderButton setAction:@selector(chooseFolderButtonClicked:)];
@@ -209,7 +211,7 @@
     NSRect downloadButtonFrame = NSMakeRect(kMargin, kMargin + 24, 160, 30);
     downloadButton = [[NSButton alloc] initWithFrame:downloadButtonFrame];
     [downloadButton setAutoresizingMask:(NSViewMaxYMargin)];
-    [downloadButton setTitle:@"Telecharger en MP3"];
+    [downloadButton setTitle:NSLocalizedString(@"download_button", nil)];
     [downloadButton setBezelStyle:NSRoundedBezelStyle];
     [downloadButton setEnabled:NO];
     [downloadButton setTarget:self];
@@ -252,7 +254,7 @@
     }
 
     [self setControlsEnabled:NO];
-    [self setStatus:@"Recherche en cours..."];
+    [self setStatus:NSLocalizedString(@"status_searching", nil)];
     [progressIndicator setIndeterminate:YES];
     [progressIndicator startAnimation:nil];
 
@@ -268,7 +270,7 @@
     [panel setCanChooseDirectories:YES];
     [panel setCanChooseFiles:NO];
     [panel setAllowsMultipleSelection:NO];
-    [panel setPrompt:@"Choisir"];
+    [panel setPrompt:NSLocalizedString(@"choose_folder_prompt", nil)];
 
     if ([panel runModal] == NSOKButton) {
         NSArray *urls = [panel URLs];
@@ -276,7 +278,7 @@
             NSURL *url = [urls objectAtIndex:0];
             [downloadDirectory release];
             downloadDirectory = [[url path] retain];
-            [folderLabel setStringValue:[@"Dossier : " stringByAppendingString:downloadDirectory]];
+            [folderLabel setStringValue:[NSLocalizedString(@"folder_prefix", nil) stringByAppendingString:downloadDirectory]];
         }
     }
 }
@@ -290,7 +292,7 @@
     SearchResult *result = [searchResults objectAtIndex:row];
 
     [self setControlsEnabled:NO];
-    [self setStatus:[@"Telechargement : " stringByAppendingString:[result title]]];
+    [self setStatus:[NSString stringWithFormat:NSLocalizedString(@"status_downloading_format", nil), [result title]]];
     [progressIndicator setIndeterminate:NO];
     [progressIndicator setDoubleValue:0.0];
 
@@ -379,9 +381,9 @@
     [self setControlsEnabled:YES];
 
     if ([results count] == 0) {
-        [self setStatus:@"Aucun resultat."];
+        [self setStatus:NSLocalizedString(@"status_no_results", nil)];
     } else {
-        [self setStatus:[NSString stringWithFormat:@"%d resultat(s).", (int)[results count]]];
+        [self setStatus:[NSString stringWithFormat:NSLocalizedString(@"status_results_format", nil), (int)[results count]]];
     }
 }
 
@@ -389,9 +391,9 @@
 {
     [progressIndicator stopAnimation:nil];
     [self setControlsEnabled:YES];
-    [self setStatus:@"Echec de la recherche."];
-    NSAlert *alert = [NSAlert alertWithMessageText:@"Recherche impossible"
-                                      defaultButton:@"OK"
+    [self setStatus:NSLocalizedString(@"status_search_failed", nil)];
+    NSAlert *alert = [NSAlert alertWithMessageText:NSLocalizedString(@"alert_search_failed_title", nil)
+                                      defaultButton:NSLocalizedString(@"alert_ok_button", nil)
                                     alternateButton:nil
                                         otherButton:nil
                           informativeTextWithFormat:@"%@", message];
@@ -411,15 +413,15 @@
 {
     [progressIndicator setDoubleValue:100.0];
     [self setControlsEnabled:YES];
-    [self setStatus:[@"Termine : " stringByAppendingString:[path lastPathComponent]]];
+    [self setStatus:[NSString stringWithFormat:NSLocalizedString(@"status_download_done_format", nil), [path lastPathComponent]]];
 }
 
 - (void)ytdlpController:(id)controller downloadDidFailWithMessage:(NSString *)message
 {
     [self setControlsEnabled:YES];
-    [self setStatus:@"Echec du telechargement."];
-    NSAlert *alert = [NSAlert alertWithMessageText:@"Telechargement impossible"
-                                      defaultButton:@"OK"
+    [self setStatus:NSLocalizedString(@"status_download_failed", nil)];
+    NSAlert *alert = [NSAlert alertWithMessageText:NSLocalizedString(@"alert_download_failed_title", nil)
+                                      defaultButton:NSLocalizedString(@"alert_ok_button", nil)
                                     alternateButton:nil
                                         otherButton:nil
                           informativeTextWithFormat:@"%@", message];
