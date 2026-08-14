@@ -63,7 +63,7 @@ echo "== 1/4: OpenSSL ${OPENSSL_VERSION} =="
 curl -L -o openssl.tar.gz "https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz"
 tar xzf openssl.tar.gz
 cd "openssl-${OPENSSL_VERSION}"
-export CC="clang -mmacosx-version-min=${DEPLOY_TARGET}"
+export CC="clang -mmacosx-version-min=${DEPLOY_TARGET} -march=core2"
 ./Configure darwin64-x86_64-cc no-shared no-tests \
     --prefix="$WORK/openssl-out" --openssldir="$WORK/openssl-out/ssl"
 make -j"$(sysctl -n hw.ncpu)"
@@ -85,7 +85,13 @@ sed -i '' "s/path = os.environ\['PATH'\]/path = os.environ.get('PATH', '\/usr\/b
     Lib/_osx_support.py
 
 export MACOSX_DEPLOYMENT_TARGET="$DEPLOY_TARGET"
-export CFLAGS="-I$WORK/openssl-out/include"
+# -march=core2: the target Mac (MacBook6,1, 2010) has a Core 2 Duo CPU,
+# which lacks SSE4.2/AVX/POPCNT and other instructions modern clang emits
+# by default on x86_64 (which just assumes "any reasonably recent Intel
+# chip"). Without this, compiled code crashes with "illegal instruction"
+# the moment it hits an auto-vectorized loop or intrinsic using a newer
+# instruction than this CPU actually has.
+export CFLAGS="-I$WORK/openssl-out/include -march=core2"
 export LDFLAGS="-L$WORK/openssl-out/lib"
 
 # GitHub Actions' macos-15-intel runners ship Homebrew with gettext

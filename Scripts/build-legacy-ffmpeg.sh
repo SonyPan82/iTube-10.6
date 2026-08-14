@@ -35,8 +35,10 @@ echo "== 1/3: libmp3lame ${LAME_VERSION} =="
 curl -L -o lame.tar.gz "https://downloads.sourceforge.net/project/lame/lame/${LAME_VERSION}/lame-${LAME_VERSION}.tar.gz"
 tar xzf lame.tar.gz
 cd "lame-${LAME_VERSION}"
-export CC="xcrun clang -arch x86_64 -mmacosx-version-min=${DEPLOY_TARGET}"
-export CFLAGS="-O2"
+# -march=core2: match the target Mac's actual CPU (2010 Core 2 Duo) so the
+# compiler never emits SSE4.2/AVX/etc instructions that CPU doesn't have.
+export CC="xcrun clang -arch x86_64 -mmacosx-version-min=${DEPLOY_TARGET} -march=core2"
+export CFLAGS="-O2 -march=core2"
 ./configure --host=x86_64-apple-darwin --enable-static --disable-shared \
     --disable-frontend --prefix="$WORK/lame-out"
 make -j"$(sysctl -n hw.ncpu)"
@@ -52,8 +54,8 @@ export PKG_CONFIG_PATH="$WORK/lame-out/lib/pkgconfig"
     --prefix="$WORK/ffmpeg-out" \
     --arch=x86_64 \
     --target-os=darwin \
-    --cc="xcrun clang -arch x86_64 -mmacosx-version-min=${DEPLOY_TARGET}" \
-    --extra-cflags="-I$WORK/lame-out/include" \
+    --cc="xcrun clang -arch x86_64 -mmacosx-version-min=${DEPLOY_TARGET} -march=core2" \
+    --extra-cflags="-I$WORK/lame-out/include -march=core2" \
     --extra-ldflags="-L$WORK/lame-out/lib -arch x86_64" \
     --disable-shared --enable-static \
     --disable-x86asm \
