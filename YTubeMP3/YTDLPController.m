@@ -43,6 +43,18 @@ static NSString * const kFinalPathMarker = @"FINALPATH:";
     return path;
 }
 
++ (NSString *)bundledCACertPath
+{
+    // python.org's Python.framework builds ship no trusted root certificates
+    // of their own (unlike the system's Keychain-backed OpenSSL) - without
+    // this, every HTTPS request fails with CERTIFICATE_VERIFY_FAILED, even
+    // to legitimate hosts. We point Python's ssl module at a bundled CA
+    // bundle via the SSL_CERT_FILE environment variable instead of relying
+    // on "Install Certificates.command", which isn't run in a vendored,
+    // non-installed interpreter.
+    return [[NSBundle mainBundle] pathForResource:@"cacert" ofType:@"pem" inDirectory:@"Tools"];
+}
+
 - (void)dealloc
 {
     [self cancelCurrentTask];
@@ -67,6 +79,13 @@ static NSString * const kFinalPathMarker = @"FINALPATH:";
     } else {
         [task setLaunchPath:ytdlpPath];
         [task setArguments:arguments];
+    }
+
+    NSString *caCertPath = [YTDLPController bundledCACertPath];
+    if (caCertPath != nil) {
+        NSMutableDictionary *env = [NSMutableDictionary dictionaryWithDictionary:[[NSProcessInfo processInfo] environment]];
+        [env setObject:caCertPath forKey:@"SSL_CERT_FILE"];
+        [task setEnvironment:env];
     }
 
     NSPipe *pipe = [NSPipe pipe];

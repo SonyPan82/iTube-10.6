@@ -40,6 +40,7 @@
 + (NSString *)bundledYTDLPPath;
 + (NSString *)bundledFFmpegPath;
 + (NSString *)bundledPythonPath; // nil if yt-dlp is a standalone binary
++ (NSString *)bundledCACertPath; // nil if no CA bundle was vendored
 
 - (void)searchForQuery:(NSString *)query maxResults:(NSInteger)maxResults;
 - (void)downloadResult:(SearchResult *)result toDirectory:(NSString *)directoryPath;
