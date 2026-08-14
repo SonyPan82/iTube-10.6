@@ -36,6 +36,12 @@
 
 set -e
 
+# Some CI shells / make invocations end up with a stripped or unset PATH by
+# the time CPython's build_ext step forks python.exe -E ./setup.py build,
+# which crashes distutils's _osx_support.py (it reads os.environ['PATH']
+# with no fallback). Guarantee it's always present and sane up front.
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:${PATH:-}"
+
 if [ "$(uname -m)" != "x86_64" ]; then
     echo "ERROR: this must run on real Intel (x86_64) hardware or an Intel CI runner." >&2
     echo "Apple Silicon can't do it - see the comment header in this script for why." >&2
