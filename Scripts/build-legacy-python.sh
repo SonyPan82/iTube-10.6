@@ -97,6 +97,7 @@ export LDFLAGS="-L$WORK/openssl-out/lib"
 # paths configure searches, so the build only ever links against genuine
 # system libraries.
 export ac_cv_lib_intl_textdomain=no
+export ac_cv_header_libintl_h=no
 export PATH="/usr/bin:/bin:/usr/sbin:/sbin"
 
 ./configure \
