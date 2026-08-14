@@ -64,7 +64,18 @@ curl -L -o openssl.tar.gz "https://www.openssl.org/source/openssl-${OPENSSL_VERS
 tar xzf openssl.tar.gz
 cd "openssl-${OPENSSL_VERSION}"
 export CC="clang -mmacosx-version-min=${DEPLOY_TARGET} -march=core2"
-./Configure darwin64-x86_64-cc no-shared no-tests \
+# no-asm: OpenSSL's hand-written assembly routines (AES-NI, PCLMUL, AVX...)
+# pick which optimized code path to run via runtime CPUID checks -
+# completely independent of the -march compiler flag above, since they're
+# not compiler-generated code. Core 2 Duo predates AES-NI/PCLMUL/AVX
+# entirely (those arrived with Westmere/Sandy Bridge, 2010-2011), and if
+# that runtime dispatch ever mis-detects or falls through, the result is a
+# genuine SIGILL ("Illegal instruction") - same failure mode as the
+# -march issue, but completely unaffected by fixing -march since this is
+# hand-written asm, not compiler output. no-asm forces pure-C
+# implementations everywhere, trading crypto throughput for guaranteed
+# compatibility - the right tradeoff for a small utility app.
+./Configure darwin64-x86_64-cc no-shared no-tests no-asm \
     --prefix="$WORK/openssl-out" --openssldir="$WORK/openssl-out/ssl"
 make -j"$(sysctl -n hw.ncpu)"
 make install_sw install_ssldirs
