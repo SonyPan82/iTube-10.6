@@ -15,7 +15,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-15-large # last Intel-based GitHub-hosted macOS runner (macos-13 was retired)
+    runs-on: macos-15-intel # last Intel-based GitHub-hosted macOS runner (macos-13 was retired; macos-15-large needs a paid "larger runner" plan)
     steps:
       - uses: actions/checkout@v4
 
