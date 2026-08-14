@@ -87,6 +87,18 @@ sed -i '' "s/path = os.environ\['PATH'\]/path = os.environ.get('PATH', '\/usr\/b
 export MACOSX_DEPLOYMENT_TARGET="$DEPLOY_TARGET"
 export CFLAGS="-I$WORK/openssl-out/include"
 export LDFLAGS="-L$WORK/openssl-out/lib"
+
+# GitHub Actions' macos-15-intel runners ship Homebrew with gettext
+# pre-installed under /usr/local/opt/gettext. CPython's configure
+# auto-detects and links against it (for the _locale module) if it's on
+# PATH/library search paths - producing a binary that depends on
+# /usr/local/opt/gettext/lib/libintl.8.dylib, a path that will never exist
+# on the target Mac. Force that detection off and strip Homebrew from the
+# paths configure searches, so the build only ever links against genuine
+# system libraries.
+export ac_cv_lib_intl_textdomain=no
+export PATH="/usr/bin:/bin:/usr/sbin:/sbin"
+
 ./configure \
     --prefix="$WORK/python-out" \
     --with-openssl="$WORK/openssl-out" \
