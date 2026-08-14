@@ -50,6 +50,16 @@ curl -L -o ffmpeg.tar.bz2 "https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.
 tar xjf ffmpeg.tar.bz2
 cd "ffmpeg-${FFMPEG_VERSION}"
 export PKG_CONFIG_PATH="$WORK/lame-out/lib/pkgconfig"
+# Deliberately NOT using --disable-everything + a curated allowlist here
+# anymore: yt-dlp's ffmpeg postprocessors (audio extraction, metadata,
+# thumbnail embedding) probe ffmpeg's capabilities and construct command
+# lines assuming a normal, reasonably complete build. A hand-picked
+# minimal feature set kept turning out to be missing something yt-dlp
+# expected ("Option not found" postprocessing errors) - safer to ship a
+# near-default ffmpeg build and only cut the pieces that genuinely can't
+# work here (network protocols - not needed, we only ever process local
+# files; hardware-accelerated encoders needing 10.7+ headers; x86 asm for
+# CPU compatibility, same reasoning as -march=core2 elsewhere).
 ./configure \
     --prefix="$WORK/ffmpeg-out" \
     --arch=x86_64 \
@@ -67,17 +77,8 @@ export PKG_CONFIG_PATH="$WORK/lame-out/lib/pkgconfig"
     --disable-avdevice \
     --disable-videotoolbox --disable-audiotoolbox --disable-appkit --disable-coreimage --disable-avfoundation \
     --enable-libmp3lame \
-    --disable-everything \
-    --enable-protocol=file \
-    --enable-demuxer=mov,matroska,webm,mp4,m4a,aac,wav,ogg,flac,mp3,image2 \
-    --enable-decoder=aac,aac_latm,opus,vorbis,flac,mp3,pcm_s16le,pcm_s16be,alac,webp,png,mjpeg \
-    --enable-encoder=libmp3lame,mjpeg,png \
-    --enable-muxer=mp3,image2 \
-    --enable-parser=aac,opus,vorbis,flac,mpegaudio,mjpeg,png,webp \
-    --enable-filter=aresample,anull \
     --enable-swresample \
-    --enable-avfilter \
-    --enable-small
+    --enable-avfilter
 make -j"$(sysctl -n hw.ncpu)"
 make install
 cd "$WORK"
