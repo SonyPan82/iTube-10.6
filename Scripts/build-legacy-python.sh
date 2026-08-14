@@ -74,6 +74,16 @@ echo "== 2/4: Python ${PYTHON_VERSION} =="
 curl -L -o python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION}/Python-${PYTHON_VERSION}.tar.xz"
 tar xJf python.tar.xz
 cd "Python-${PYTHON_VERSION}"
+
+# CPython's own build_ext step forks "python.exe -E ./setup.py build" to
+# compile the stdlib's C extension modules. Something in that forked
+# process's environment ends up without PATH (observed on GitHub Actions'
+# macos-15-intel runners; harmless to patch defensively regardless of root
+# cause) which crashes distutils's _osx_support.py with a bare KeyError
+# since it indexes os.environ['PATH'] with no fallback. Make it tolerant.
+sed -i '' "s/path = os.environ\['PATH'\]/path = os.environ.get('PATH', '\/usr\/bin:\/bin:\/usr\/local\/bin')/" \
+    Lib/_osx_support.py
+
 export MACOSX_DEPLOYMENT_TARGET="$DEPLOY_TARGET"
 export CFLAGS="-I$WORK/openssl-out/include"
 export LDFLAGS="-L$WORK/openssl-out/lib"
