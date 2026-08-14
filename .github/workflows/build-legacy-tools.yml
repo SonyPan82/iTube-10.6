@@ -1,0 +1,39 @@
+name: Build legacy tools (Intel, 10.6-targeted)
+
+# Runs the parts of the toolchain that need real x86_64 hardware: a
+# from-source Python 3.11 (+ OpenSSL) targeting -mmacosx-version-min=10.6,
+# which Apple Silicon can't produce locally (Rosetta refuses to execute the
+# freshly-built interpreter mid-build - see Docs/ARCHITECTURE.md). ffmpeg
+# and yt-dlp/cacert.pem are rebuilt here too for a consistent, reproducible
+# artifact, even though those two don't strictly need Intel.
+#
+# Trigger manually from the Actions tab (workflow_dispatch), or:
+#   gh workflow run build-legacy-tools.yml
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: macos-13 # last Intel-based GitHub-hosted macOS runner
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build ffmpeg + ffprobe
+        run: ./Scripts/build-legacy-ffmpeg.sh
+
+      - name: Build Python 3.11 + OpenSSL (10.6-targeted)
+        run: ./Scripts/build-legacy-python.sh
+
+      - name: Vendor yt-dlp (latest) + CA bundle
+        run: ./vendor.sh
+
+      - name: Package Tools/
+        run: |
+          ditto -c -k --keepParent Tools Tools.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Tools-x86_64-10.6
+          path: Tools.zip
+          retention-days: 14

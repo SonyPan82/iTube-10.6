@@ -43,7 +43,7 @@
 + (NSString *)bundledCACertPath; // nil if no CA bundle was vendored
 
 - (void)searchForQuery:(NSString *)query maxResults:(NSInteger)maxResults;
-- (void)downloadResult:(SearchResult *)result toDirectory:(NSString *)directoryPath;
+- (void)downloadResult:(SearchResult *)result toDirectory:(NSString *)directoryPath embedThumbnail:(BOOL)embedThumbnail;
 - (void)cancelCurrentTask;
 
 @end

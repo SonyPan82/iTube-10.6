@@ -10,6 +10,7 @@
 /* Search */
 "search_placeholder" = "Rechercher une video YouTube...";
 "search_button" = "Rechercher";
+"embed_thumbnail_checkbox" = "Utiliser la photo YouTube comme image d'album";
 "column_title" = "Titre";
 "column_uploader" = "Chaine";
 "column_duration" = "Duree";

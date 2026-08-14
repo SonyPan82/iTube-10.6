@@ -36,11 +36,15 @@ static NSString * const kFinalPathMarker = @"FINALPATH:";
 
 + (NSString *)bundledPythonPath
 {
-    // Only present if vendor.sh bundled a portable python3 interpreter
-    // because the vendored yt-dlp is a plain script rather than a
-    // standalone PyInstaller binary. See README.md for details.
-    NSString *path = [[NSBundle mainBundle] pathForResource:@"python3" ofType:nil inDirectory:@"Tools/Python.framework/Versions/3.6/bin"];
-    return path;
+    // Prefer the from-source Python 3.11 built by Scripts/build-legacy-python.sh
+    // (required for any yt-dlp release still able to talk to current YouTube -
+    // see Docs/ARCHITECTURE.md). Fall back to the python.org-installer-based
+    // Python 3.6 from vendor.sh if that hasn't been built yet.
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"python3.11" ofType:nil inDirectory:@"Tools/Python3.11/bin"];
+    if (path != nil) {
+        return path;
+    }
+    return [[NSBundle mainBundle] pathForResource:@"python3" ofType:nil inDirectory:@"Tools/Python.framework/Versions/3.6/bin"];
 }
 
 + (NSString *)bundledCACertPath
@@ -153,7 +157,7 @@ static NSString * const kFinalPathMarker = @"FINALPATH:";
 
 #pragma mark - Download
 
-- (void)downloadResult:(SearchResult *)result toDirectory:(NSString *)directoryPath
+- (void)downloadResult:(SearchResult *)result toDirectory:(NSString *)directoryPath embedThumbnail:(BOOL)embedThumbnail
 {
     [self cancelCurrentTask];
 
@@ -162,7 +166,7 @@ static NSString * const kFinalPathMarker = @"FINALPATH:";
     NSString *ffmpegPath = [YTDLPController bundledFFmpegPath];
     NSString *printFormat = [kFinalPathMarker stringByAppendingString:@"%(filepath)s"];
 
-    NSArray *args = [NSArray arrayWithObjects:
+    NSMutableArray *args = [NSMutableArray arrayWithObjects:
                       @"-x",
                       @"--audio-format", @"mp3",
                       @"--audio-quality", @"0",
@@ -171,8 +175,12 @@ static NSString * const kFinalPathMarker = @"FINALPATH:";
                       @"-o", outputTemplate,
                       @"--newline",
                       @"--print", [@"after_move:" stringByAppendingString:printFormat],
-                      videoURL,
                       nil];
+
+    if (embedThumbnail) {
+        [args addObject:@"--embed-thumbnail"];
+    }
+    [args addObject:videoURL];
 
     isSearchTask = NO;
     [pendingDownloadResult release];

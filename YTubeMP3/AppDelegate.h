@@ -15,6 +15,7 @@
 
     NSTextField *searchField;
     NSButton *searchButton;
+    NSButton *embedThumbnailCheckbox;
 
     NSScrollView *tableScrollView;
     NSTableView *resultsTableView;

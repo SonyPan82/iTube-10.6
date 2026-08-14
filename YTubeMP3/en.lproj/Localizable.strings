@@ -10,6 +10,7 @@
 /* Search */
 "search_placeholder" = "Search a YouTube video...";
 "search_button" = "Search";
+"embed_thumbnail_checkbox" = "Use YouTube thumbnail as album art";
 "column_title" = "Title";
 "column_uploader" = "Channel";
 "column_duration" = "Duration";

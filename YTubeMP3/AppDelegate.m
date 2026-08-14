@@ -148,8 +148,18 @@
     [content addSubview:searchButton];
     [searchButton release];
 
+    // --- Options row ---
+    NSRect embedThumbFrame = NSMakeRect(kMargin, kWindowHeight - 68, kWindowWidth - kMargin * 2, 20);
+    embedThumbnailCheckbox = [[NSButton alloc] initWithFrame:embedThumbFrame];
+    [embedThumbnailCheckbox setAutoresizingMask:(NSViewWidthSizable | NSViewMinYMargin)];
+    [embedThumbnailCheckbox setButtonType:NSSwitchButton];
+    [embedThumbnailCheckbox setTitle:NSLocalizedString(@"embed_thumbnail_checkbox", nil)];
+    [embedThumbnailCheckbox setState:NSOnState];
+    [content addSubview:embedThumbnailCheckbox];
+    [embedThumbnailCheckbox release];
+
     // --- Results table ---
-    NSRect scrollFrame = NSMakeRect(kMargin, 116, kWindowWidth - kMargin * 2, kWindowHeight - 116 - 60);
+    NSRect scrollFrame = NSMakeRect(kMargin, 116, kWindowWidth - kMargin * 2, kWindowHeight - 116 - 84);
     tableScrollView = [[NSScrollView alloc] initWithFrame:scrollFrame];
     [tableScrollView setAutoresizingMask:(NSViewWidthSizable | NSViewHeightSizable)];
     [tableScrollView setHasVerticalScroller:YES];
@@ -296,7 +306,8 @@
     [progressIndicator setIndeterminate:NO];
     [progressIndicator setDoubleValue:0.0];
 
-    [ytdlp downloadResult:result toDirectory:downloadDirectory];
+    BOOL embedThumbnail = ([embedThumbnailCheckbox state] == NSOnState);
+    [ytdlp downloadResult:result toDirectory:downloadDirectory embedThumbnail:embedThumbnail];
 }
 
 #pragma mark - Helpers
