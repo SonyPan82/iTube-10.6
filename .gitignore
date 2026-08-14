@@ -9,3 +9,4 @@ Tools/
 # Extracted from Apple's Xcode 3.2.6 installer (proprietary, ~235MB) --
 # regenerate with the steps in Docs/BUILD_LEGACY.md, don't commit it.
 Toolchain/SDKs/
+.claude/
